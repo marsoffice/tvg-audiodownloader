@@ -21,7 +21,7 @@ namespace MarsOffice.Tvg.AudioDownloader
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            
+            builder.Services.AddHttpClient();
         }
     }
 }
