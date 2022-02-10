@@ -12,6 +12,8 @@ namespace MarsOffice.Tvg.AudioDownloader.Abstractions
         public string UserEmail { get; set; }
         public string FileLink { get; set; }
         public string FileName { get; set; }
+        public string Category { get; set; }
+        public string LanguageCode { get; set; }
         public bool Success { get; set; }
         public string Error { get; set; }
     }

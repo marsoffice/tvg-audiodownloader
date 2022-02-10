@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MarsOffice.Tvg.AudioDownloader.Abstractions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace MarsOffice.Tvg.AudioDownloader
@@ -11,10 +12,12 @@ namespace MarsOffice.Tvg.AudioDownloader
     public class RequestAudioBackgroundConsumer
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _config;
 
-        public RequestAudioBackgroundConsumer(IHttpClientFactory httpClientFactory)
+        public RequestAudioBackgroundConsumer(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
             _httpClient = httpClientFactory.CreateClient();
+            _config = config;
         }
 
         [FunctionName("RequestAudioBackgroundConsumer")]
