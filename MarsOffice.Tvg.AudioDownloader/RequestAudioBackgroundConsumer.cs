@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using MarsOffice.Tvg.AudioDownloader.Abstractions;
 using Microsoft.Azure.Storage;
@@ -14,12 +13,10 @@ namespace MarsOffice.Tvg.AudioDownloader
 {
     public class RequestAudioBackgroundConsumer
     {
-        private readonly HttpClient _httpClient;
         private readonly IConfiguration _config;
 
-        public RequestAudioBackgroundConsumer(IHttpClientFactory httpClientFactory, IConfiguration config)
+        public RequestAudioBackgroundConsumer(IConfiguration config)
         {
-            _httpClient = httpClientFactory.CreateClient();
             _config = config;
         }
 
