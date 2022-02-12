@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MarsOffice.Tvg.AudioDownloader.Abstractions;
 using Microsoft.Azure.Storage;
@@ -59,6 +60,10 @@ namespace MarsOffice.Tvg.AudioDownloader
 
                 var selectedBlob = blobs[randomIndex];
 
+                var fileNameSplit = selectedBlob.StorageUri.PrimaryUri.LocalPath.ToString().Split("/");
+                var fileName = fileNameSplit.Last();
+                var filePath = "audio/" + fileName; 
+
                 await audioBackgroundResultQueue.AddAsync(new AudioBackgroundResult
                 {
                     VideoId = request.VideoId,
@@ -66,10 +71,10 @@ namespace MarsOffice.Tvg.AudioDownloader
                     JobId = request.JobId,
                     UserEmail = request.UserEmail,
                     UserId = request.UserId,
-                    FileLink = selectedBlob.StorageUri.PrimaryUri.ToString(),
+                    FileLink = filePath,
                     Category = request.Category,
                     LanguageCode = request.LanguageCode,
-                    FileName = selectedBlob.StorageUri.PrimaryUri.LocalPath
+                    FileName = fileName
                 });
                 await audioBackgroundResultQueue.FlushAsync();
             }
