@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MarsOffice.Tvg.AudioDownloader.Abstractions;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Azure.Storage.Queue.Protocol;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
@@ -23,10 +24,16 @@ namespace MarsOffice.Tvg.AudioDownloader
 
         [FunctionName("RequestAudioBackgroundConsumer")]
         public async Task Run(
-            [QueueTrigger("request-audiobackground", Connection = "localsaconnectionstring")] RequestAudioBackground request,
+            [QueueTrigger("request-audiobackground", Connection = "localsaconnectionstring")] QueueMessage message,
             [Queue("audiobackground-result", Connection = "localsaconnectionstring")] IAsyncCollector<AudioBackgroundResult> audioBackgroundResultQueue,
             ILogger log)
         {
+            var request = Newtonsoft.Json.JsonConvert.DeserializeObject<RequestAudioBackground>(message.Text,
+                    new Newtonsoft.Json.JsonSerializerSettings
+                    {
+                        ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+                        NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
+                    });
             try
             {
                 var cloudStorageAccount = CloudStorageAccount.Parse(_config["localsaconnectionstring"]);
@@ -80,18 +87,21 @@ namespace MarsOffice.Tvg.AudioDownloader
             }
             catch (Exception e)
             {
-                await audioBackgroundResultQueue.AddAsync(new AudioBackgroundResult
+                if (message.DequeueCount >= 5)
                 {
-                    VideoId = request.VideoId,
-                    Success = false,
-                    Error = e.Message,
-                    JobId = request.JobId,
-                    UserEmail = request.UserEmail,
-                    UserId = request.UserId,
-                    Category = request.Category,
-                    LanguageCode = request.LanguageCode
-                });
-                await audioBackgroundResultQueue.FlushAsync();
+                    await audioBackgroundResultQueue.AddAsync(new AudioBackgroundResult
+                    {
+                        VideoId = request.VideoId,
+                        Success = false,
+                        Error = e.Message,
+                        JobId = request.JobId,
+                        UserEmail = request.UserEmail,
+                        UserId = request.UserId,
+                        Category = request.Category,
+                        LanguageCode = request.LanguageCode
+                    });
+                    await audioBackgroundResultQueue.FlushAsync();
+                }
                 throw;
             }
         }
