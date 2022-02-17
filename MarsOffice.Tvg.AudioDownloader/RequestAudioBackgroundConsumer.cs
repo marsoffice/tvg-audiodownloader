@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MarsOffice.Tvg.AudioDownloader.Abstractions;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.Queue.Protocol;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
@@ -24,11 +24,11 @@ namespace MarsOffice.Tvg.AudioDownloader
 
         [FunctionName("RequestAudioBackgroundConsumer")]
         public async Task Run(
-            [QueueTrigger("request-audiobackground", Connection = "localsaconnectionstring")] QueueMessage message,
+            [QueueTrigger("request-audiobackground", Connection = "localsaconnectionstring")] CloudQueueMessage message,
             [Queue("audiobackground-result", Connection = "localsaconnectionstring")] IAsyncCollector<AudioBackgroundResult> audioBackgroundResultQueue,
             ILogger log)
         {
-            var request = Newtonsoft.Json.JsonConvert.DeserializeObject<RequestAudioBackground>(message.Text,
+            var request = Newtonsoft.Json.JsonConvert.DeserializeObject<RequestAudioBackground>(message.AsString,
                     new Newtonsoft.Json.JsonSerializerSettings
                     {
                         ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
