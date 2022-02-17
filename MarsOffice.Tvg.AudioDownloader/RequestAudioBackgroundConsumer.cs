@@ -94,7 +94,7 @@ namespace MarsOffice.Tvg.AudioDownloader
                     {
                         VideoId = request.VideoId,
                         Success = false,
-                        Error = e.Message,
+                        Error = "AudioDownloaderService: " + e.Message,
                         JobId = request.JobId,
                         UserEmail = request.UserEmail,
                         UserId = request.UserId,
