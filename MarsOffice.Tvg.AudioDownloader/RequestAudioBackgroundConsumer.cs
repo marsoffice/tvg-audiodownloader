@@ -92,6 +92,7 @@ namespace MarsOffice.Tvg.AudioDownloader
                     LanguageCode = request.LanguageCode
                 });
                 await audioBackgroundResultQueue.FlushAsync();
+                throw;
             }
         }
     }
