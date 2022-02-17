@@ -87,6 +87,7 @@ namespace MarsOffice.Tvg.AudioDownloader
             }
             catch (Exception e)
             {
+                log.LogError(e, "Function threw an exception");
                 if (message.DequeueCount >= 5)
                 {
                     await audioBackgroundResultQueue.AddAsync(new AudioBackgroundResult
